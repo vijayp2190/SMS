@@ -1,0 +1,27 @@
+
+.bcard {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 43px 32px;
+  position: relative;
+  background-color: rgb(255, 255, 255);
+  box-shadow: none;
+  border: 0;
+}
+.bg-login-image {
+  height: 100vh;
+  background: url(https://isomorphic.redq.io/static/media/sign.adf5846b.jpg) center center / cover no-repeat;
+}
+/* .bg-login-image:before {
+  content: "";
+  width: 75.3%;
+  height: 100%;
+  display: flex;
+  background-color: rgba(0, 0, 0, 0.6);
+  position: absolute;
+  z-index: 1;
+  top: 0px;
+  left: 0px;
+  right: inherit;
+} */
