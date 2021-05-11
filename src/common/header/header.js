@@ -16,12 +16,15 @@ import { ChevronLeft, ChevronRight, Menu } from "@material-ui/icons";
 import { Link, navigate } from "@reach/router";
 import classnames from "classnames";
 import clsx from "clsx";
+
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { isLoginPage } from "../../account/account_action";
+
 import rootRoute from "../../system/route";
-import HeaderRight from "./header_right";
+import HeaderRight from "../header/header_right";
+import menuItems from "../header/menu_items";
 import Login from "../../account/login";
-import menuItems from "./menu_items";
 import useStyles from "./header_styles";
 
 export default function Navigation(props) {
@@ -32,31 +35,47 @@ export default function Navigation(props) {
   const [open, setOpen] = React.useState(false);
   const [currentPage, setCurrentPage] = useState("Dashboard");
   const [isLogin, setIsLogin] = React.useState(false);
-  const [basePath, setBasePath] = useState(process.env.REACT_APP_BASE_PATH);
   const reducerState = useSelector((state) => state);
-  const [appId, setAppId] = React.useState(0);
-
 
   React.useEffect(() => {
-    setIsLogin(true);
-  },);
+    if (!isLoggedIn()) {
+      dispatch(isLoginPage(true));
+      setIsLogin(true);
+      navigate('login', {});
+    }
+    else {
+      navigate('dashboard', {});
+    }
 
 
- 
+  }, [
+    reducerState.account.isLoginPage,
+  ]);
+  const isLoggedIn = () => {
+    let token = localStorage.getItem("token");
+    if (token) {
+      return true;
+    }
+    return false;
+  };
 
   const handleDrawerOpen = () => {
     setOpen(true);
   };
-
   const handleDrawerClose = () => {
     setOpen(false);
   };
-
+  const onLogin = (token, userName = "", displayName = "", email = "") => {
+    dispatch(isLoginPage(false));
+    localStorage.setItem("token", token);
+    navigate('/dashboard', {});
+    setIsLogin(false);
+  };
 
   return (
     <>
       {isLogin ? (
-       <Login/>
+        <Login path="/login" onLogin={onLogin} />
       ) : (
         <div className={classes.root}>
           <AppBar
@@ -77,19 +96,15 @@ export default function Navigation(props) {
                 <Menu />
               </IconButton>
               <Typography>
-                <Avatar>
-                  <img
-                    src="http://home.boxerproperty.com/Assets/CommonFiles/New_Images/Main_logo.png"
-                    style={{ maxWidth: "100%" }}
-                    className="header-logo"
-                    alt="stemmons-logo"
-                  ></img>
-                </Avatar>
+                <Link
+                  to={"/dahboard"}
+                  target="_seft"
+                  style={{ color: "black" }}
+                >
+                  SMS
+                      </Link>
               </Typography>
-
-             
-{/* 
-              <HeaderRight /> */}
+              <HeaderRight />
             </Toolbar>
           </AppBar>
 
@@ -115,10 +130,9 @@ export default function Navigation(props) {
             </div>
             <List className="sidebar-navigation-block">
               {menuItems.map((item, index) => (
-
                 <>
                   {
-                    (item.menutype !== undefined && item.menutype !== " " && item.menutype !== "internal"  && item.menutype === "external")
+                    (item.menutype !== undefined && item.menutype !== " " && item.menutype !== "internal" && item.menutype === "external")
                       ?
                       <a
                         href={item.menuPath}
@@ -137,7 +151,7 @@ export default function Navigation(props) {
                       </a>
                       :
                       <Link
-                        to={basePath + appId + item.menuPath}
+                        to={item.menuPath}
                         target="_seft"
                         style={{ color: "black" }}
                         key={index}
@@ -153,8 +167,6 @@ export default function Navigation(props) {
                       </Link>
                   }
                 </>
-
-
               ))}
             </List>
           </Drawer>
